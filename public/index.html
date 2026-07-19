@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Kit | @seuusuario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-toolbar no-print">
+        <div class="auth-toolbar-meta">
+            <span class="auth-toolbar-label">Conta <strong id="user-name">carregando...</strong></span>
+            <span class="auth-toolbar-subtitle" id="user-email">carregando...</span>
+            <span id="sync-status" class="sync-status">Preparando sincronizacao...</span>
+        </div>
+        <button id="logout-button" class="auth-toolbar-button" type="button">Sair</button>
+    </div>
+
+    <div id="app">
+        <!-- 00. Header -->
+        <header id="header">
+            <div class="header-left">
+                <h1 class="name dynamic-name">NOME SOBRENOME</h1>
+                <div class="title dynamic-title">INFLUENCIADOR DIGITAL • UGC CREATOR</div>
+                <div class="tags dynamic-tags">LIFESTYLE • HUMOR • AUTOCUIDADO • DANÇA • FITNESS</div>
+            </div>
+            <div class="header-right">
+                <img src="" alt="Foto de Perfil" class="image-placeholder dynamic-img-header">
+            </div>
+        </header>
+
+        <!-- 01. Quem Sou -->
+        <section id="about" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <h2 class="section-title">Quem é <span class="dynamic-firstname">Nome</span></h2>
+            </div>
+            <p class="dynamic-bio">Aqui vai a sua bio profissional e estratégica, explicando seu nicho, abordagem e o valor que você entrega para as marcas.</p>
+            <div class="about-image-placeholder">
+                <img src="" alt="Foto sobre mim" class="image-placeholder dynamic-img-about">
+            </div>
+        </section>
+
+        <!-- 02. Números -->
+        <section id="numbers" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <h2 class="section-title">Números que Conectam</h2>
+            </div>
+            <div class="numbers-content dynamic-stats">
+                <!-- Stats serão injetados pelo JS -->
+            </div>
+            <div class="numbers-image-placeholder">
+                <img src="" alt="Foto para números" class="image-placeholder dynamic-img-numbers">
+            </div>
+        </section>
+
+        <!-- 03. Marcas Parceiras -->
+        <section id="partners" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <h2 class="section-title">Marcas Parceiras</h2>
+            </div>
+            <div class="partners-grid dynamic-partners">
+                <!-- Logos serão injetados pelo JS -->
+            </div>
+            <p class="footer-text dynamic-partners-footer">E muitas outras histórias construídas com confiança e resultados.</p>
+        </section>
+
+        <!-- 04. Serviços -->
+        <section id="services" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <h2 class="section-title">Serviços</h2>
+            </div>
+            <ul class="services-list dynamic-services">
+                <!-- Serviços serão injetados pelo JS -->
+            </ul>
+            <div class="services-image-placeholder">
+                <img src="" alt="Foto para serviços" class="image-placeholder dynamic-img-services">
+            </div>
+        </section>
+
+        <!-- 05. Por que trabalhar comigo? -->
+        <section id="why" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <h2 class="section-title">Por que trabalhar comigo?</h2>
+            </div>
+            <ul class="why-list dynamic-reasons">
+                <!-- Razões serão injetadas pelo JS -->
+            </ul>
+            <div class="why-image-placeholder">
+                <img src="" alt="Foto para 'por que trabalhar comigo'" class="image-placeholder dynamic-img-why">
+            </div>
+        </section>
+
+        <!-- 06. Portfolio -->
+        <section id="portfolio" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">06</span>
+                <h2 class="section-title">Alguns conteúdos que eu crio</h2>
+            </div>
+            <div class="portfolio-content dynamic-portfolio">
+                <!-- Itens do portfólio serão injetados pelo JS -->
+            </div>
+        </section>
+
+        <!-- 07. Contato -->
+        <section id="contact" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">07</span>
+                <h2 class="section-title">Vamos criar juntos?</h2>
+            </div>
+            <div class="contact-list dynamic-contacts">
+                <!-- Contatos serão injetados pelo JS -->
+            </div>
+            <p class="contact-footer dynamic-contact-footer">Conteúdos que conectam. Parcerias que transformam.</p>
+        </section>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel no-print">
+        <button id="toggle-admin" class="admin-toggle">
+            <i data-lucide="settings"></i>
+        </button>
+        <div class="admin-content">
+            <h3>Configurar Media Kit</h3>
+            
+            <div class="admin-section">
+                <h4>Perfil da Conta</h4>
+                <p class="admin-note">Esses dados sao salvos na tabela profiles e usados como base da sua conta.</p>
+                <div class="admin-group"><label>Nome Completo da Conta</label><input type="text" id="edit-profile-name" placeholder="Seu nome completo"></div>
+                <div class="admin-group"><label>E-mail da Conta</label><input type="email" id="edit-profile-email" readonly></div>
+                <div class="admin-group"><label>Nova Senha</label><input type="password" id="edit-password" placeholder="Opcional"></div>
+                <div class="admin-group"><label>Confirmar Nova Senha</label><input type="password" id="edit-password-confirmation" placeholder="Opcional"></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Dados Principais</h4>
+                <div class="admin-group"><label>Nome Completo</label><input type="text" id="edit-name"></div>
+                <div class="admin-group"><label>Título (Ex: Influenciador Digital)</label><input type="text" id="edit-title"></div>
+                <div class="admin-group"><label>Tags (Separadas por •)</label><input type="text" id="edit-tags"></div>
+                <div class="admin-group"><label>Bio</label><textarea id="edit-bio" rows="4"></textarea></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Imagens</h4>
+                <p class="admin-note">Cole uma URL externa ou envie um arquivo. Os uploads vao para o Supabase Storage.</p>
+                <div class="admin-group admin-group-upload"><label>Foto Principal (Header)</label><input type="text" id="edit-img-header" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="header" accept="image/*"></label></div>
+                <div class="admin-group admin-group-upload"><label>Foto 'Quem Sou'</label><input type="text" id="edit-img-about" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="about" accept="image/*"></label></div>
+                <div class="admin-group admin-group-upload"><label>Foto 'Números'</label><input type="text" id="edit-img-numbers" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="numbers" accept="image/*"></label></div>
+                <div class="admin-group admin-group-upload"><label>Foto 'Serviços'</label><input type="text" id="edit-img-services" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="services" accept="image/*"></label></div>
+                <div class="admin-group admin-group-upload"><label>Foto 'Por que trabalhar comigo?'</label><input type="text" id="edit-img-why" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="why" accept="image/*"></label></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Serviços</h4>
+                <div id="edit-services-container"></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Razões para trabalhar comigo</h4>
+                <div id="edit-reasons-container"></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Marcas Parceiras</h4>
+                <div id="edit-partners-container"></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Portfólio</h4>
+                <p class="admin-note">Adicione mídias do seu computador. O sistema detectará se é imagem ou vídeo.</p>
+                <div id="edit-portfolio-container"></div>
+                <button class="btn-add" id="add-portfolio-item" data-list="portfolio">Adicionar Mídia</button>
+            </div>
+
+            <div class="admin-section">
+                <h4>Contato</h4>
+                <div id="edit-contacts-container"></div>
+            </div>
+
+            <div class="admin-actions">
+                <button class="btn-save" id="save-data">Salvar Alterações</button>
+                <button class="btn-reset" id="reset-data">Resetar</button>
+                <button class="btn-print-sidebar" onclick="window.print()">Exportar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
