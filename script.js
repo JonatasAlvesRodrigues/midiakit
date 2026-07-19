@@ -123,7 +123,6 @@ function initAdmin() {
     const toggleBtn = document.getElementById('toggle-admin');
     const saveBtn = document.getElementById('save-data');
     const resetBtn = document.getElementById('reset-data');
-    const addPortfolioBtn = document.getElementById('add-portfolio-item');
 
     toggleBtn.addEventListener('click', () => adminPanel.classList.toggle('active'));
 
@@ -180,17 +179,51 @@ function initAdmin() {
     };
 
     function renderAdminLists() {
-        createListEditor('edit-services-container', mediaKitData.services, [{key: 'name', label: 'Nome do Serviço'}], {listName: 'services'});
-        createListEditor('edit-reasons-container', mediaKitData.reasons, [{key: 'text', label: 'Texto da Razão'}], {listName: 'reasons'});
+        createListEditor('edit-services-container', mediaKitData.services, [{key: 'icon', label: 'Ícone (Lucide)'}, {key: 'name', label: 'Nome do Serviço'}], {listName: 'services'});
+        createListEditor('edit-reasons-container', mediaKitData.reasons, [{key: 'icon', label: 'Ícone (Lucide)'}, {key: 'text', label: 'Texto da Razão'}], {listName: 'reasons'});
         createListEditor('edit-partners-container', mediaKitData.partners, [{key: 'name', label: 'Nome'}, {key: 'logo', label: 'URL do Logo'}], {listName: 'partners'});
         createListEditor('edit-portfolio-container', mediaKitData.portfolio, [{key: 'url', label: 'URL da Mídia'}], {isPortfolio: true, listName: 'portfolio'});
-        createListEditor('edit-contacts-container', mediaKitData.contacts, [{key: 'value', label: 'Informação de Contato'}], {listName: 'contacts'});
+        createListEditor('edit-contacts-container', mediaKitData.contacts, [{key: 'icon', label: 'Ícone (Lucide)'}, {key: 'value', label: 'Informação de Contato'}], {listName: 'contacts'});
     }
 
     renderAdminLists();
 
-    // Adicionar item ao portfólio
-    addPortfolioBtn.addEventListener('click', () => {
+    // Adicionar item a uma lista
+    adminPanel.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-add')) {
+            const listName = e.target.dataset.list;
+            if (listName && mediaKitData[listName]) {
+                // Adiciona um novo item padrão à lista
+                let newItem;
+                switch (listName) {
+                    case 'services':
+                        newItem = { icon: 'plus-circle', name: 'Novo Serviço' };
+                        break;
+                    case 'reasons':
+                        newItem = { icon: 'plus-circle', text: 'Nova Razão' };
+                        break;
+                    case 'partners':
+                        newItem = { name: 'Nova Marca', logo: 'https://via.placeholder.com/150' };
+                        break;
+                    case 'portfolio':
+                        // A lógica de adicionar portfólio é diferente (upload de arquivo)
+                        openPortfolioUpload();
+                        return; // Sai da função para não executar o resto
+                    case 'contacts':
+                        newItem = { icon: 'mail', value: 'novo@contato.com' };
+                        break;
+                    default:
+                        newItem = {};
+                }
+                mediaKitData[listName].push(newItem);
+                renderAdminLists();
+                populateMediaKit();
+            }
+        }
+    });
+
+    // Função para abrir o upload de portfólio
+    function openPortfolioUpload() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*,video/*';
@@ -205,7 +238,7 @@ function initAdmin() {
             }
         };
         fileInput.click();
-    });
+    }
 
     // Remover item de uma lista
     adminPanel.addEventListener('click', (e) => {
@@ -249,10 +282,10 @@ function initAdmin() {
             });
         };
 
-        saveList('edit-services-container', mediaKitData.services, [{key: 'name'}]);
-        saveList('edit-reasons-container', mediaKitData.reasons, [{key: 'text'}]);
+        saveList('edit-services-container', mediaKitData.services, [{key: 'icon'}, {key: 'name'}]);
+        saveList('edit-reasons-container', mediaKitData.reasons, [{key: 'icon'}, {key: 'text'}]);
         saveList('edit-partners-container', mediaKitData.partners, [{key: 'name'}, {key: 'logo'}]);
-        saveList('edit-contacts-container', mediaKitData.contacts, [{key: 'value'}]);
+        saveList('edit-contacts-container', mediaKitData.contacts, [{key: 'icon'}, {key: 'value'}]);
 
         localStorage.setItem('mediaKitCarmoV2', JSON.stringify(mediaKitData));
         populateMediaKit();
