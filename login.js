@@ -119,24 +119,29 @@ async function handleLogin(event) {
     setStatus("", "");
     setSubmitting("login-form", true);
 
-    const formData = new FormData(event.currentTarget);
-    const email = String(formData.get("email") || "").trim();
-    const password = String(formData.get("password") || "");
-    const client = await ensureSupabase();
-    const { error } = await client.auth.signInWithPassword({
-        email,
-        password
-    });
+    try {
+        const formData = new FormData(event.currentTarget);
+        const email = String(formData.get("email") || "").trim();
+        const password = String(formData.get("password") || "");
+        const client = await ensureSupabase();
+        const { error } = await client.auth.signInWithPassword({
+            email,
+            password
+        });
 
-    setSubmitting("login-form", false);
+        if (error) {
+            setStatus(error.message, "error");
+            return;
+        }
 
-    if (error) {
-        setStatus(error.message, "error");
-        return;
+        setStatus("Login realizado com sucesso. Redirecionando...", "success");
+        window.location.replace(getAppUrl());
+    } catch (error) {
+        console.error("Falha ao fazer login:", error);
+        setStatus(error.message || "Nao foi possivel entrar agora. Tente novamente.", "error");
+    } finally {
+        setSubmitting("login-form", false);
     }
-
-    setStatus("Login realizado com sucesso. Redirecionando...", "success");
-    window.location.replace(getAppUrl());
 }
 
 async function handleRegister(event) {
@@ -144,38 +149,43 @@ async function handleRegister(event) {
     setStatus("", "");
     setSubmitting("register-form", true);
 
-    const formData = new FormData(event.currentTarget);
-    const name = String(formData.get("name") || "").trim();
-    const email = String(formData.get("email") || "").trim();
-    const password = String(formData.get("password") || "");
-    const client = await ensureSupabase();
-    const publicConfig = window.supabasePublicConfig || {};
-    const { data, error } = await client.auth.signUp({
-        email,
-        password,
-        options: {
-            emailRedirectTo: publicConfig.emailRedirectTo || `${window.location.origin}${getAppUrl("login.html")}`,
-            data: {
-                name
+    try {
+        const formData = new FormData(event.currentTarget);
+        const name = String(formData.get("name") || "").trim();
+        const email = String(formData.get("email") || "").trim();
+        const password = String(formData.get("password") || "");
+        const client = await ensureSupabase();
+        const publicConfig = window.supabasePublicConfig || {};
+        const { data, error } = await client.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: publicConfig.emailRedirectTo || `${window.location.origin}${getAppUrl("login.html")}`,
+                data: {
+                    name
+                }
             }
+        });
+
+        if (error) {
+            setStatus(error.message, "error");
+            return;
         }
-    });
 
-    setSubmitting("register-form", false);
+        if (data.session) {
+            setStatus("Conta criada com sucesso. Redirecionando...", "success");
+            window.location.replace(getAppUrl());
+            return;
+        }
 
-    if (error) {
-        setStatus(error.message, "error");
-        return;
+        setStatus("Conta criada. Verifique seu e-mail para confirmar o acesso.", "success");
+        showForm("login-form");
+    } catch (error) {
+        console.error("Falha ao criar conta:", error);
+        setStatus(error.message || "Nao foi possivel criar a conta agora. Tente novamente.", "error");
+    } finally {
+        setSubmitting("register-form", false);
     }
-
-    if (data.session) {
-        setStatus("Conta criada com sucesso. Redirecionando...", "success");
-        window.location.replace(getAppUrl());
-        return;
-    }
-
-    setStatus("Conta criada. Verifique seu e-mail para confirmar o acesso.", "success");
-    showForm("login-form");
 }
 
 async function handleResetRequest(event) {
@@ -183,22 +193,27 @@ async function handleResetRequest(event) {
     setStatus("", "");
     setSubmitting("reset-request-form", true);
 
-    const formData = new FormData(event.currentTarget);
-    const email = String(formData.get("email") || "").trim();
-    const client = await ensureSupabase();
-    const publicConfig = window.supabasePublicConfig || {};
-    const { error } = await client.auth.resetPasswordForEmail(email, {
-        redirectTo: publicConfig.passwordResetRedirectTo || `${window.location.origin}${getAppUrl("login.html")}?mode=reset`
-    });
+    try {
+        const formData = new FormData(event.currentTarget);
+        const email = String(formData.get("email") || "").trim();
+        const client = await ensureSupabase();
+        const publicConfig = window.supabasePublicConfig || {};
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: publicConfig.passwordResetRedirectTo || `${window.location.origin}${getAppUrl("login.html")}?mode=reset`
+        });
 
-    setSubmitting("reset-request-form", false);
+        if (error) {
+            setStatus(error.message, "error");
+            return;
+        }
 
-    if (error) {
-        setStatus(error.message, "error");
-        return;
+        setStatus("Enviamos o link de redefinicao para o seu e-mail.", "success");
+    } catch (error) {
+        console.error("Falha ao solicitar redefinicao:", error);
+        setStatus(error.message || "Nao foi possivel enviar o link agora. Tente novamente.", "error");
+    } finally {
+        setSubmitting("reset-request-form", false);
     }
-
-    setStatus("Enviamos o link de redefinicao para o seu e-mail.", "success");
 }
 
 async function handlePasswordUpdate(event) {
@@ -222,22 +237,27 @@ async function handlePasswordUpdate(event) {
         return;
     }
 
-    const client = await ensureSupabase();
-    const { error } = await client.auth.updateUser({
-        password
-    });
+    try {
+        const client = await ensureSupabase();
+        const { error } = await client.auth.updateUser({
+            password
+        });
 
-    setSubmitting("reset-password-form", false);
+        if (error) {
+            setStatus(error.message, "error");
+            return;
+        }
 
-    if (error) {
-        setStatus(error.message, "error");
-        return;
+        setStatus("Senha atualizada com sucesso. Redirecionando...", "success");
+        window.setTimeout(() => {
+            window.location.replace(getAppUrl());
+        }, 1200);
+    } catch (error) {
+        console.error("Falha ao atualizar senha:", error);
+        setStatus(error.message || "Nao foi possivel atualizar a senha agora. Tente novamente.", "error");
+    } finally {
+        setSubmitting("reset-password-form", false);
     }
-
-    setStatus("Senha atualizada com sucesso. Redirecionando...", "success");
-    window.setTimeout(() => {
-        window.location.replace(getAppUrl());
-    }, 1200);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
