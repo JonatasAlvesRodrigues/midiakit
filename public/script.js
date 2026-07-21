@@ -123,6 +123,10 @@ function isDirectImageUrl(url) {
 }
 
 function isTouchViewport() {
+    if (!window.matchMedia) {
+        return window.innerWidth <= 768;
+    }
+
     return window.matchMedia("(hover: none), (pointer: coarse), (max-width: 768px)").matches;
 }
 
@@ -971,7 +975,10 @@ function initAdmin() {
     fillMainInputs();
     renderAdminLists();
     updateShareLinkUi();
-    openAdminPanel();
+
+    if (!isTouchViewport()) {
+        openAdminPanel();
+    }
 
     document.querySelectorAll(".edit-img-file").forEach((input) => {
         input.addEventListener("change", async (event) => {
