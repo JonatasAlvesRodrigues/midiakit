@@ -77,6 +77,7 @@ function normalizeMediaKitData(payload) {
             ...(payload.images || {})
         },
         stats: Array.isArray(payload.stats) ? payload.stats : base.stats,
+        insights: Array.isArray(payload.insights) ? payload.insights : base.insights,
         partners: Array.isArray(payload.partners) ? payload.partners : base.partners,
         services: Array.isArray(payload.services) ? payload.services : base.services,
         reasons: Array.isArray(payload.reasons) ? payload.reasons : base.reasons,
@@ -373,6 +374,19 @@ function populateMediaKit() {
         </div>
     `).join("");
 
+    const insightsContainer = document.querySelector(".dynamic-insights");
+    if (insightsContainer) {
+        insightsContainer.innerHTML = mediaKitData.insights.map((insight) => `
+            <div class="insight-item">
+                <i data-lucide="${insight.icon}"></i>
+                <div>
+                    <div class="insight-value">${insight.value || "-"}</div>
+                    <div class="insight-label">${insight.label}</div>
+                </div>
+            </div>
+        `).join("");
+    }
+
     const partnersContainer = document.querySelector(".dynamic-partners");
     if (mediaKitData.partners.length > 0) {
         const duplicatedPartners = [...mediaKitData.partners, ...mediaKitData.partners];
@@ -510,6 +524,7 @@ async function requireAuthenticatedUser() {
 function initAdmin() {
     const adminPanel = document.getElementById("admin-panel");
     const toggleButton = document.getElementById("toggle-admin");
+    const openAdminButton = document.getElementById("open-admin-button");
     const saveButton = document.getElementById("save-data");
     const resetButton = document.getElementById("reset-data");
 
@@ -562,6 +577,7 @@ function initAdmin() {
         createListEditor("edit-services-container", mediaKitData.services, [{ key: "icon", label: "Icone (Lucide)" }, { key: "name", label: "Nome do Servico" }], { listName: "services" });
         createListEditor("edit-reasons-container", mediaKitData.reasons, [{ key: "icon", label: "Icone (Lucide)" }, { key: "text", label: "Texto da Razao" }], { listName: "reasons" });
         createListEditor("edit-partners-container", mediaKitData.partners, [{ key: "name", label: "Nome" }, { key: "logo", label: "URL do Logo" }], { listName: "partners" });
+        createListEditor("edit-insights-container", mediaKitData.insights, [{ key: "icon", label: "Icone (Lucide)" }, { key: "label", label: "Nome do dado" }, { key: "value", label: "Numero ou informacao" }], { listName: "insights" });
         createListEditor("edit-portfolio-container", mediaKitData.portfolio, [{ key: "url", label: "Arquivo no Storage" }], { isPortfolio: true, listName: "portfolio" });
         createListEditor("edit-contacts-container", mediaKitData.contacts, [{ key: "icon", label: "Icone (Lucide)" }, { key: "value", label: "Informacao de Contato" }], { listName: "contacts" });
     };
@@ -591,7 +607,13 @@ function initAdmin() {
         fileInput.click();
     };
 
-    toggleButton.addEventListener("click", () => adminPanel.classList.toggle("active"));
+    const toggleAdminPanel = () => adminPanel.classList.toggle("active");
+    const openAdminPanel = () => adminPanel.classList.add("active");
+
+    toggleButton.addEventListener("click", toggleAdminPanel);
+    if (openAdminButton) {
+        openAdminButton.addEventListener("click", openAdminPanel);
+    }
 
     fillMainInputs();
     renderAdminLists();
@@ -641,6 +663,9 @@ function initAdmin() {
                 break;
             case "partners":
                 newItem = { name: "Nova Marca", logo: "https://via.placeholder.com/150" };
+                break;
+            case "insights":
+                newItem = { icon: "bar-chart-3", label: "Novo insight", value: "+0" };
                 break;
             case "portfolio":
                 openPortfolioUpload();
@@ -709,6 +734,7 @@ function initAdmin() {
             saveList("edit-services-container", mediaKitData.services, [{ key: "icon" }, { key: "name" }]);
             saveList("edit-reasons-container", mediaKitData.reasons, [{ key: "icon" }, { key: "text" }]);
             saveList("edit-partners-container", mediaKitData.partners, [{ key: "name" }, { key: "logo" }]);
+            saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }]);
             saveList("edit-contacts-container", mediaKitData.contacts, [{ key: "icon" }, { key: "value" }]);
 
             await saveProfileData();

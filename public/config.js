@@ -28,6 +28,15 @@ const mediaKitConfig = {
         { icon: "heart", label: "Alto engajamento e conexao real com a audiencia", value: "" }
     ],
 
+    insights: [
+        { icon: "eye", label: "Visualizacoes mensais", value: "+1.2M" },
+        { icon: "bar-chart-3", label: "Alcance medio", value: "+800 mil" },
+        { icon: "users", label: "Publico principal", value: "18-34 anos" },
+        { icon: "map-pin", label: "Maior publico", value: "Brasil" },
+        { icon: "venus-and-mars", label: "Genero predominante", value: "Feminino e masculino" },
+        { icon: "target", label: "Perfil alvo", value: "Lifestyle, humor e autocuidado" }
+    ],
+
     partners: [
         { name: "TIM", logo: "https://logodownload.org/wp-content/uploads/2014/04/tim-logo-1-1.png" },
         { name: "Chiquinho", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4U6W_0bS0d-N-3u-sQJg-3bJgQ2wYJg&s" },

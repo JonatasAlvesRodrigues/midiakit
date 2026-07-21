@@ -50,6 +50,13 @@ body {
     gap: 4px;
 }
 
+.auth-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
 .auth-toolbar-label {
     font-size: 14px;
     color: var(--text-secondary);
@@ -80,6 +87,10 @@ body {
     cursor: wait;
 }
 
+.auth-toolbar-edit {
+    background: var(--text-light);
+}
+
 .sync-status {
     font-size: 12px;
     color: var(--text-secondary);
@@ -106,6 +117,7 @@ body {
     grid-template-areas:
         "header header header header header header header header header header header header"
         "about about about about numbers numbers numbers numbers partners partners partners partners"
+        "insights insights insights insights insights insights insights insights insights insights insights insights"
         "services services services services why why why why why why why why"
         "portfolio portfolio portfolio portfolio portfolio portfolio contact contact contact contact contact contact";
 }
@@ -272,6 +284,54 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
+}
+
+/* =============================
+   03. INSIGHTS
+   ============================= */
+#insights {
+    grid-area: insights;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.insight-item {
+    min-height: 120px;
+    padding: 18px;
+    border: 1px solid rgba(245, 239, 239, 0.12);
+    border-radius: 8px;
+    background: rgba(59, 47, 45, 0.28);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.insight-item i {
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
+}
+
+.insight-value {
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 1.1;
+    color: var(--text-light);
+    overflow-wrap: anywhere;
+}
+
+.insight-label {
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* =============================
@@ -544,9 +604,9 @@ body {
    ============================= */
 .admin-panel {
     position: fixed;
-    top: 20px;
+    top: 100px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1200;
 }
 .admin-toggle {
     width: 50px; height: 50px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -622,6 +682,7 @@ body {
             "header"
             "about"
             "numbers"
+            "insights"
             "partners"
             "services"
             "why"
@@ -640,6 +701,28 @@ body {
         align-items: flex-start;
         flex-direction: column;
         margin-bottom: 20px;
+    }
+    .auth-toolbar-actions {
+        width: 100%;
+    }
+    .auth-toolbar-button {
+        flex: 1;
+    }
+    .admin-panel {
+        top: auto;
+        right: 14px;
+        bottom: 14px;
+    }
+    .admin-content {
+        position: fixed;
+        top: 16px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-height: calc(100vh - 32px);
+    }
+    .insights-grid {
+        grid-template-columns: 1fr;
     }
     .grid-section { padding: 20px; }
     #header { padding: 30px 20px; }

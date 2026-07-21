@@ -15,7 +15,10 @@
             <span class="auth-toolbar-subtitle" id="user-email">carregando...</span>
             <span id="sync-status" class="sync-status">Preparando sincronizacao...</span>
         </div>
-        <button id="logout-button" class="auth-toolbar-button" type="button">Sair</button>
+        <div class="auth-toolbar-actions">
+            <button id="open-admin-button" class="auth-toolbar-button auth-toolbar-edit" type="button">Editar media kit</button>
+            <button id="logout-button" class="auth-toolbar-button" type="button">Sair</button>
+        </div>
     </div>
 
     <div id="app">
@@ -57,10 +60,21 @@
             </div>
         </section>
 
-        <!-- 03. Marcas Parceiras -->
-        <section id="partners" class="grid-section">
+        <!-- 03. Insights do Perfil -->
+        <section id="insights" class="grid-section">
             <div class="section-header">
                 <span class="section-number">03</span>
+                <h2 class="section-title">Insights do Perfil</h2>
+            </div>
+            <div class="insights-grid dynamic-insights">
+                <!-- Insights serao injetados pelo JS -->
+            </div>
+        </section>
+
+        <!-- 04. Marcas Parceiras -->
+        <section id="partners" class="grid-section">
+            <div class="section-header">
+                <span class="section-number">04</span>
                 <h2 class="section-title">Marcas Parceiras</h2>
             </div>
             <div class="partners-grid dynamic-partners">
@@ -72,7 +86,7 @@
         <!-- 04. Serviços -->
         <section id="services" class="grid-section">
             <div class="section-header">
-                <span class="section-number">04</span>
+                <span class="section-number">05</span>
                 <h2 class="section-title">Serviços</h2>
             </div>
             <ul class="services-list dynamic-services">
@@ -86,7 +100,7 @@
         <!-- 05. Por que trabalhar comigo? -->
         <section id="why" class="grid-section">
             <div class="section-header">
-                <span class="section-number">05</span>
+                <span class="section-number">06</span>
                 <h2 class="section-title">Por que trabalhar comigo?</h2>
             </div>
             <ul class="why-list dynamic-reasons">
@@ -100,7 +114,7 @@
         <!-- 06. Portfolio -->
         <section id="portfolio" class="grid-section">
             <div class="section-header">
-                <span class="section-number">06</span>
+                <span class="section-number">07</span>
                 <h2 class="section-title">Alguns conteúdos que eu crio</h2>
             </div>
             <div class="portfolio-content dynamic-portfolio">
@@ -111,7 +125,7 @@
         <!-- 07. Contato -->
         <section id="contact" class="grid-section">
             <div class="section-header">
-                <span class="section-number">07</span>
+                <span class="section-number">08</span>
                 <h2 class="section-title">Vamos criar juntos?</h2>
             </div>
             <div class="contact-list dynamic-contacts">
@@ -169,6 +183,13 @@
             <div class="admin-section">
                 <h4>Marcas Parceiras</h4>
                 <div id="edit-partners-container"></div>
+            </div>
+
+            <div class="admin-section">
+                <h4>Insights do Perfil</h4>
+                <p class="admin-note">Mostre visualizacoes, alcance, idade do publico, localizacao e outros dados importantes para marcas.</p>
+                <div id="edit-insights-container"></div>
+                <button class="btn-add" data-list="insights">Adicionar Insight</button>
             </div>
 
             <div class="admin-section">
