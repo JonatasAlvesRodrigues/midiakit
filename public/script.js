@@ -103,7 +103,27 @@ function normalizeExternalUrl(url) {
 }
 
 function inferPortfolioTypeFromUrl(url) {
-    return /\.(mp4|webm|mov)(\?|#|$)/i.test(url) ? "video" : "image";
+    if (isDirectVideoUrl(url)) {
+        return "video";
+    }
+
+    if (isDirectImageUrl(url)) {
+        return "image";
+    }
+
+    return "link";
+}
+
+function isDirectVideoUrl(url) {
+    return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(String(url || ""));
+}
+
+function isDirectImageUrl(url) {
+    return /\.(jpg|jpeg|png|webp|gif)(\?|#|$)/i.test(String(url || ""));
+}
+
+function isTouchViewport() {
+    return window.matchMedia("(hover: none), (pointer: coarse), (max-width: 768px)").matches;
 }
 
 function clampPercent(value, fallback = 65) {
@@ -619,7 +639,8 @@ function populateMediaKit() {
     const portfolioContainer = document.querySelector(".dynamic-portfolio");
     const renderablePortfolio = mediaKitData.portfolio.filter((item) => item.url && !isLikelyBrokenExternalUrl(item.url));
     portfolioContainer.innerHTML = renderablePortfolio.map((item) => {
-        const isVideo = item.type === "video";
+        const isVideo = item.type === "video" && isDirectVideoUrl(item.url);
+        const isImage = item.type !== "link" && (item.type === "image" || isDirectImageUrl(item.url));
         const originalUrl = normalizeExternalUrl(item.originalUrl || item.sourceUrl || item.url);
         const openOriginalLink = originalUrl ? `
             <a class="portfolio-original-link" href="${originalUrl}" target="_blank" rel="noopener noreferrer">
@@ -630,9 +651,19 @@ function populateMediaKit() {
         if (isVideo) {
             return `
                 <div class="portfolio-item">
-                    <video src="${item.url}" loop playsinline class="portfolio-media"></video>
+                    <video src="${item.url}" loop muted playsinline preload="metadata" class="portfolio-media"></video>
                     ${openOriginalLink}
                 </div>
+            `;
+        }
+
+        if (!isImage) {
+            return `
+                <a class="portfolio-item portfolio-link-item" href="${originalUrl}" target="_blank" rel="noopener noreferrer">
+                    <i data-lucide="external-link"></i>
+                    <span>Abrir conteudo original</span>
+                    <small>${originalUrl.replace(/^https?:\/\//i, "")}</small>
+                </a>
             `;
         }
 
@@ -644,6 +675,23 @@ function populateMediaKit() {
         `;
     }).join("");
 
+    const portfolioVideos = Array.from(document.querySelectorAll(".portfolio-item video"));
+    if (isTouchViewport() && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                const video = entry.target;
+                if (entry.isIntersecting) {
+                    video.muted = true;
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
+            });
+        }, { threshold: 0.55 });
+
+        portfolioVideos.forEach((video) => observer.observe(video));
+    }
+
     document.querySelectorAll(".portfolio-item").forEach((item) => {
         const video = item.querySelector("video");
         if (!video) {
@@ -652,10 +700,16 @@ function populateMediaKit() {
 
         video.muted = true;
         item.addEventListener("mouseover", () => {
+            if (isTouchViewport()) {
+                return;
+            }
             video.muted = false;
             video.play();
         });
         item.addEventListener("mouseout", () => {
+            if (isTouchViewport()) {
+                return;
+            }
             video.pause();
             video.currentTime = 0;
             video.muted = true;
@@ -794,8 +848,9 @@ function initAdmin() {
                     <div class="admin-group">
                         <label>Tipo</label>
                         <select class="edit-type" data-index="${index}">
-                            <option value="image" ${item.type !== "video" ? "selected" : ""}>Imagem</option>
+                            <option value="image" ${item.type !== "video" && item.type !== "link" ? "selected" : ""}>Imagem</option>
                             <option value="video" ${item.type === "video" ? "selected" : ""}>Video</option>
+                            <option value="link" ${item.type === "link" ? "selected" : ""}>Link externo</option>
                         </select>
                     </div>
                     <div class="admin-group">
@@ -1090,11 +1145,11 @@ function initAdmin() {
             return;
         }
 
-        mediaKitData.portfolio.push({
-            type: inferPortfolioTypeFromUrl(url),
-            url,
-            originalUrl: url
-        });
+            mediaKitData.portfolio.push({
+                type: "link",
+                url,
+                originalUrl: url
+            });
         if (portfolioLinkInput) {
             portfolioLinkInput.value = "";
         }
