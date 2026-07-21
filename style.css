@@ -19,6 +19,28 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+}
+
+button:active,
+a:active {
+    transform: translateY(1px);
+}
+
 body {
     font-family: var(--font-sans);
     background-color: var(--bg-main);
@@ -949,4 +971,250 @@ body.public-view .admin-panel {
     .header-left .name { font-size: 48px; }
     .partners-grid { grid-template-columns: 1fr; }
     .portfolio-content { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 12px;
+        overflow-x: hidden;
+    }
+
+    body.public-view {
+        padding-top: 12px;
+    }
+
+    .auth-toolbar {
+        gap: 14px;
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .auth-toolbar-meta {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .auth-toolbar-label,
+    .auth-toolbar-subtitle,
+    .sync-status {
+        overflow-wrap: anywhere;
+    }
+
+    .auth-toolbar-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .auth-toolbar-button {
+        min-height: 44px;
+        padding: 10px 12px;
+        border-radius: 9px;
+        font-size: 13px;
+    }
+
+    #app {
+        gap: 12px;
+    }
+
+    .grid-section,
+    #header {
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    #header {
+        gap: 22px;
+        text-align: left;
+    }
+
+    .header-right {
+        order: -1;
+        height: auto;
+        aspect-ratio: 4 / 5;
+        max-height: 430px;
+    }
+
+    .header-left .name {
+        font-size: 44px;
+        line-height: 1;
+        overflow-wrap: anywhere;
+    }
+
+    .header-left .title,
+    .header-left .tags {
+        font-size: 12px;
+        line-height: 1.5;
+        letter-spacing: 1.2px;
+    }
+
+    .section-header {
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .section-number {
+        font-size: 26px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        line-height: 1.35;
+        letter-spacing: 1px;
+    }
+
+    .about-image-placeholder,
+    .numbers-image-placeholder,
+    .services-image-placeholder,
+    .why-image-placeholder {
+        height: auto;
+        min-height: 190px;
+        aspect-ratio: 4 / 3;
+    }
+
+    .numbers-content,
+    .services-list,
+    .why-list,
+    .contact-list {
+        gap: 14px;
+    }
+
+    .stat-item,
+    .services-list li,
+    .why-list li,
+    .contact-item {
+        align-items: flex-start;
+    }
+
+    .insights-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .insight-item {
+        min-height: 112px;
+        padding: 14px;
+    }
+
+    .insight-value {
+        font-size: 20px;
+    }
+
+    #partners {
+        min-height: 220px;
+    }
+
+    .partners-grid {
+        gap: 18px;
+    }
+
+    .partner-logo {
+        width: 132px;
+        height: 64px;
+    }
+
+    #partners .footer-text {
+        width: calc(100% - 28px);
+        bottom: 18px;
+        line-height: 1.35;
+    }
+
+    .portfolio-content {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .portfolio-item {
+        height: auto;
+        min-height: 260px;
+        aspect-ratio: 4 / 5;
+    }
+
+    .portfolio-original-link {
+        right: 10px;
+        bottom: 10px;
+        padding: 10px 12px;
+    }
+
+    #contact {
+        min-height: 360px;
+    }
+
+    .contact-footer {
+        position: static;
+        transform: none;
+        margin-top: 42px;
+        text-align: center;
+    }
+
+    .admin-panel {
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .admin-toggle {
+        width: 54px;
+        height: 54px;
+    }
+
+    .admin-content {
+        top: auto;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        width: 100vw;
+        max-height: 92vh;
+        border-radius: 18px 18px 0 0;
+        border-right: none;
+        border-left: none;
+    }
+
+    .admin-header {
+        padding: 18px 16px 12px;
+    }
+
+    .admin-nav {
+        top: 69px;
+        padding: 10px 16px;
+    }
+
+    .admin-section {
+        margin: 14px 14px;
+        padding: 14px;
+    }
+
+    .admin-group-upload,
+    .share-box,
+    .portfolio-actions,
+    .admin-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-group input,
+    .admin-group textarea,
+    .admin-group select,
+    .btn-upload-label,
+    .admin-actions button,
+    .btn-add,
+    .share-box button {
+        min-height: 44px;
+    }
+
+    .admin-actions {
+        padding: 12px 14px 14px;
+    }
+
+    .admin-actions .btn-print-sidebar {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 380px) {
+    .header-left .name {
+        font-size: 38px;
+    }
+
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
 }
