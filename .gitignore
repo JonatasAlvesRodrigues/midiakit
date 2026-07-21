@@ -6,3 +6,6 @@
 
 # Supabase local temp files
 supabase/.temp/
+
+# Temporary export/copy folder
+github_push_tmp/
