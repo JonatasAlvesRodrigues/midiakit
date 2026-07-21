@@ -707,8 +707,15 @@ function populateMediaKit() {
             if (isTouchViewport()) {
                 return;
             }
-            video.muted = false;
-            video.play();
+
+            video.muted = true;
+            video.play()
+                .then(() => {
+                    video.muted = false;
+                })
+                .catch(() => {
+                    video.muted = true;
+                });
         });
         item.addEventListener("mouseout", () => {
             if (isTouchViewport()) {
