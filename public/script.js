@@ -525,6 +525,7 @@ function initAdmin() {
     const adminPanel = document.getElementById("admin-panel");
     const toggleButton = document.getElementById("toggle-admin");
     const openAdminButton = document.getElementById("open-admin-button");
+    const closeAdminButton = document.getElementById("close-admin-button");
     const saveButton = document.getElementById("save-data");
     const resetButton = document.getElementById("reset-data");
 
@@ -550,7 +551,7 @@ function initAdmin() {
         const container = document.getElementById(containerId);
         container.innerHTML = dataArray.map((item, index) => `
             <div class="admin-list-item">
-                <button class="btn-remove-item" data-list="${options.listName}" data-index="${index}">x</button>
+                <button class="btn-remove-item" type="button" title="Remover item" data-list="${options.listName}" data-index="${index}">x</button>
                 <h5>Item ${index + 1}</h5>
                 ${fields.map((field) => {
                     if (options.isPortfolio) {
@@ -609,11 +610,24 @@ function initAdmin() {
 
     const toggleAdminPanel = () => adminPanel.classList.toggle("active");
     const openAdminPanel = () => adminPanel.classList.add("active");
+    const closeAdminPanel = () => adminPanel.classList.remove("active");
 
     toggleButton.addEventListener("click", toggleAdminPanel);
     if (openAdminButton) {
         openAdminButton.addEventListener("click", openAdminPanel);
     }
+    if (closeAdminButton) {
+        closeAdminButton.addEventListener("click", closeAdminPanel);
+    }
+
+    adminPanel.querySelectorAll(".admin-nav button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const target = document.getElementById(button.dataset.target);
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+    });
 
     fillMainInputs();
     renderAdminLists();

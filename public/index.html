@@ -141,9 +141,26 @@
             <i data-lucide="settings"></i>
         </button>
         <div class="admin-content">
-            <h3>Configurar Media Kit</h3>
+            <div class="admin-header">
+                <div>
+                    <h3>Editar media kit</h3>
+                    <p>Atualize as informacoes e salve para aplicar no perfil.</p>
+                </div>
+                <button id="close-admin-button" class="admin-close" type="button" aria-label="Fechar painel">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="admin-nav" aria-label="Atalhos do editor">
+                <button type="button" data-target="admin-account">Conta</button>
+                <button type="button" data-target="admin-main">Principal</button>
+                <button type="button" data-target="admin-images">Imagens</button>
+                <button type="button" data-target="edit-insights-container">Insights</button>
+                <button type="button" data-target="edit-services-container">Conteudo</button>
+                <button type="button" data-target="edit-contacts-container">Contato</button>
+            </div>
             
-            <div class="admin-section">
+            <div class="admin-section" id="admin-account">
                 <h4>Perfil da Conta</h4>
                 <p class="admin-note">Esses dados sao salvos na tabela profiles e usados como base da sua conta.</p>
                 <div class="admin-group"><label>Nome Completo da Conta</label><input type="text" id="edit-profile-name" placeholder="Seu nome completo"></div>
@@ -152,7 +169,7 @@
                 <div class="admin-group"><label>Confirmar Nova Senha</label><input type="password" id="edit-password-confirmation" placeholder="Opcional"></div>
             </div>
 
-            <div class="admin-section">
+            <div class="admin-section" id="admin-main">
                 <h4>Dados Principais</h4>
                 <div class="admin-group"><label>Nome Completo</label><input type="text" id="edit-name"></div>
                 <div class="admin-group"><label>Título (Ex: Influenciador Digital)</label><input type="text" id="edit-title"></div>
@@ -160,7 +177,7 @@
                 <div class="admin-group"><label>Bio</label><textarea id="edit-bio" rows="4"></textarea></div>
             </div>
 
-            <div class="admin-section">
+            <div class="admin-section" id="admin-images">
                 <h4>Imagens</h4>
                 <p class="admin-note">Cole uma URL externa ou envie um arquivo. Os uploads vao para o Supabase Storage.</p>
                 <div class="admin-group admin-group-upload"><label>Foto Principal (Header)</label><input type="text" id="edit-img-header" placeholder="URL da imagem"><label class="btn-upload-label">Escolher arquivo<input type="file" class="edit-img-file" data-target="header" accept="image/*"></label></div>
@@ -173,16 +190,19 @@
             <div class="admin-section">
                 <h4>Serviços</h4>
                 <div id="edit-services-container"></div>
+                <button class="btn-add" data-list="services">Adicionar Servico</button>
             </div>
 
             <div class="admin-section">
                 <h4>Razões para trabalhar comigo</h4>
                 <div id="edit-reasons-container"></div>
+                <button class="btn-add" data-list="reasons">Adicionar Razao</button>
             </div>
 
             <div class="admin-section">
                 <h4>Marcas Parceiras</h4>
                 <div id="edit-partners-container"></div>
+                <button class="btn-add" data-list="partners">Adicionar Marca</button>
             </div>
 
             <div class="admin-section">
@@ -202,6 +222,7 @@
             <div class="admin-section">
                 <h4>Contato</h4>
                 <div id="edit-contacts-container"></div>
+                <button class="btn-add" data-list="contacts">Adicionar Contato</button>
             </div>
 
             <div class="admin-actions">
