@@ -62,6 +62,20 @@ function buildPublicShareUrl(slug = currentPublicSlug) {
     return `${window.location.origin}${window.location.pathname}?kit=${encodeURIComponent(slug)}`;
 }
 
+function getAppBasePath() {
+    const path = window.location.pathname;
+    if (path.endsWith("/login.html")) {
+        return path.slice(0, -"login.html".length);
+    }
+
+    const lastSlashIndex = path.lastIndexOf("/");
+    return path.slice(0, lastSlashIndex + 1) || "/";
+}
+
+function getAppUrl(path = "") {
+    return `${getAppBasePath()}${path}`;
+}
+
 function setSyncStatus(message, type = "") {
     const syncStatus = getSyncStatusElement();
     if (!syncStatus) {
@@ -535,7 +549,7 @@ async function signOutCurrentUser(button) {
         return;
     }
 
-    window.location.replace("/login.html");
+    window.location.replace(getAppUrl("login.html"));
 }
 
 function updateAuthUi(session) {
@@ -564,13 +578,13 @@ async function requireAuthenticatedUser() {
     const { data, error } = await getSupabaseClient().auth.getSession();
     if (error) {
         alert(error.message);
-        window.location.replace("/login.html");
+        window.location.replace(getAppUrl("login.html"));
         return false;
     }
 
     const session = data.session;
     if (!session) {
-        window.location.replace("/login.html");
+        window.location.replace(getAppUrl("login.html"));
         return false;
     }
 
@@ -580,7 +594,7 @@ async function requireAuthenticatedUser() {
 
     getSupabaseClient().auth.onAuthStateChange(async (event, nextSession) => {
         if (event === "SIGNED_OUT" || !nextSession) {
-            window.location.replace("/login.html");
+            window.location.replace(getAppUrl("login.html"));
             return;
         }
 
