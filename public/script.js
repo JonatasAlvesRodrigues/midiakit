@@ -436,7 +436,9 @@ function populateMediaKit() {
     Object.keys(mediaKitData.images).forEach((key) => {
         const imageElement = document.querySelector(`.dynamic-img-${key}`);
         if (imageElement) {
-            imageElement.src = mediaKitData.images[key];
+            const imageUrl = mediaKitData.images[key];
+            imageElement.toggleAttribute("hidden", !imageUrl);
+            imageElement.src = imageUrl || "";
         }
     });
 

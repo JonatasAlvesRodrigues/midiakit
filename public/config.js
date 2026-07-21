@@ -14,11 +14,11 @@ const mediaKitConfig = {
     bio: "Tenho 27 anos, sou professor, dancarino e influenciador digital ha mais de 5 anos. Crio conteudos autenticos que misturam lifestyle, humor e autocuidado, sempre de forma leve e verdadeira.",
 
     images: {
-        header: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
-        about: "https://images.unsplash.com/photo-1614283233556-f35b7c8273ac?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
-        numbers: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80",
-        services: "https://images.unsplash.com/photo-1521146764736-56c929d59c83?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
-        why: "https://images.unsplash.com/photo-1581338834647-b0fb40704e21?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
+        header: "",
+        about: "",
+        numbers: "",
+        services: "",
+        why: ""
     },
 
     stats: [
@@ -64,11 +64,7 @@ const mediaKitConfig = {
         { icon: "check-circle", text: "Foco em resultados e conversao" }
     ],
 
-    portfolio: [
-        { type: "video", url: "https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-a-bridge-42233-large.mp4" },
-        { type: "image", url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" },
-        { type: "video", url: "https://assets.mixkit.co/videos/preview/mixkit-hip-hop-dancer-in-a-basement-43955-large.mp4" }
-    ],
+    portfolio: [],
 
     contacts: [
         { icon: "instagram", value: "@carmo_joao2" },
