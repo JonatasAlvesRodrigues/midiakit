@@ -89,6 +89,23 @@ function isLikelyBrokenExternalUrl(url) {
     return /encrypted-tbn\d*\.gstatic\.com\/images/i.test(String(url || ""));
 }
 
+function normalizeExternalUrl(url) {
+    const trimmedUrl = String(url || "").trim();
+    if (!trimmedUrl) {
+        return "";
+    }
+
+    if (/^https?:\/\//i.test(trimmedUrl)) {
+        return trimmedUrl;
+    }
+
+    return `https://${trimmedUrl}`;
+}
+
+function inferPortfolioTypeFromUrl(url) {
+    return /\.(mp4|webm|mov)(\?|#|$)/i.test(url) ? "video" : "image";
+}
+
 function setSyncStatus(message, type = "") {
     const syncStatus = getSyncStatusElement();
     if (!syncStatus) {
@@ -581,10 +598,18 @@ function populateMediaKit() {
     const renderablePortfolio = mediaKitData.portfolio.filter((item) => item.url && !isLikelyBrokenExternalUrl(item.url));
     portfolioContainer.innerHTML = renderablePortfolio.map((item) => {
         const isVideo = item.type === "video";
+        const originalUrl = normalizeExternalUrl(item.originalUrl || item.sourceUrl || item.url);
+        const openOriginalLink = originalUrl ? `
+            <a class="portfolio-original-link" href="${originalUrl}" target="_blank" rel="noopener noreferrer">
+                Ver original
+            </a>
+        ` : "";
+
         if (isVideo) {
             return `
                 <div class="portfolio-item">
                     <video src="${item.url}" loop playsinline class="portfolio-media"></video>
+                    ${openOriginalLink}
                 </div>
             `;
         }
@@ -592,6 +617,7 @@ function populateMediaKit() {
         return `
             <div class="portfolio-item">
                 <img src="${item.url}" class="portfolio-media" alt="Portfolio item" onerror="this.closest('.portfolio-item').style.display='none'">
+                ${openOriginalLink}
             </div>
         `;
     }).join("");
@@ -709,6 +735,7 @@ function initAdmin() {
     const generateShareButton = document.getElementById("generate-share-link");
     const copyShareButton = document.getElementById("copy-share-link");
     const shareLinkInput = document.getElementById("public-share-link");
+    const addPortfolioLinkButton = document.getElementById("add-portfolio-link");
 
     const updateShareLinkUi = () => {
         if (shareLinkInput) {
@@ -740,14 +767,26 @@ function initAdmin() {
             <div class="admin-list-item">
                 <button class="btn-remove-item" type="button" title="Remover item" data-list="${options.listName}" data-index="${index}">x</button>
                 <h5>Item ${index + 1}</h5>
+                ${options.isPortfolio ? `
+                    <div class="admin-group">
+                        <label>Tipo</label>
+                        <select class="edit-type" data-index="${index}">
+                            <option value="image" ${item.type !== "video" ? "selected" : ""}>Imagem</option>
+                            <option value="video" ${item.type === "video" ? "selected" : ""}>Video</option>
+                        </select>
+                    </div>
+                    <div class="admin-group">
+                        <label>URL exibida no media kit</label>
+                        <input type="text" class="edit-url" data-index="${index}" value="${item.url || ""}">
+                    </div>
+                    <div class="admin-group">
+                        <label>Link do video/conteudo original</label>
+                        <input type="text" class="edit-originalUrl" data-index="${index}" value="${item.originalUrl || item.sourceUrl || item.url || ""}" placeholder="https://...">
+                    </div>
+                ` : ""}
                 ${fields.map((field) => {
                     if (options.isPortfolio) {
-                        return `
-                            <div class="admin-group">
-                                <label>${field.label}</label>
-                                <input type="text" class="edit-${field.key}" data-index="${index}" value="${item[field.key] || ""}" readonly>
-                            </div>
-                        `;
+                        return "";
                     }
 
                     return `
@@ -783,7 +822,7 @@ function initAdmin() {
             try {
                 const publicUrl = await uploadAsset(file, "portfolio");
                 const type = file.type.startsWith("video") ? "video" : "image";
-                mediaKitData.portfolio.push({ type, url: publicUrl });
+                mediaKitData.portfolio.push({ type, url: publicUrl, originalUrl: publicUrl });
                 renderAdminLists();
                 populateMediaKit();
                 setSyncStatus("Upload concluido. Clique em salvar para persistir as alteracoes.", "success");
@@ -826,6 +865,7 @@ function initAdmin() {
         saveList("edit-reasons-container", mediaKitData.reasons, [{ key: "icon" }, { key: "text" }]);
         saveList("edit-partners-container", mediaKitData.partners, [{ key: "name" }, { key: "logo" }]);
         saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }]);
+        saveList("edit-portfolio-container", mediaKitData.portfolio, [{ key: "type" }, { key: "url" }, { key: "originalUrl" }]);
         saveList("edit-contacts-container", mediaKitData.contacts, [{ key: "icon" }, { key: "value" }]);
     };
 
@@ -1016,6 +1056,24 @@ function initAdmin() {
 
             await navigator.clipboard.writeText(shareLinkInput.value);
             alert("Link copiado.");
+        });
+    }
+
+    if (addPortfolioLinkButton) {
+        addPortfolioLinkButton.addEventListener("click", () => {
+            const url = normalizeExternalUrl(window.prompt("Cole o link do video ou conteudo original:"));
+            if (!url) {
+                return;
+            }
+
+            mediaKitData.portfolio.push({
+                type: inferPortfolioTypeFromUrl(url),
+                url,
+                originalUrl: url
+            });
+            renderAdminLists();
+            populateMediaKit();
+            setSyncStatus("Link adicionado. Clique em salvar para persistir as alteracoes.", "success");
         });
     }
 
