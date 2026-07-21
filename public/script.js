@@ -155,8 +155,16 @@ function sanitizeFileName(fileName) {
         .replace(/-+/g, "-");
 }
 
-function buildStoragePath(scope, fileName) {
-    return `${currentUser.id}/${scope}/${Date.now()}-${crypto.randomUUID()}-${sanitizeFileName(fileName)}`;
+function createId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function buildStoragePath(userId, scope, fileName) {
+    return `${userId}/${scope}/${Date.now()}-${createId()}-${sanitizeFileName(fileName)}`;
 }
 
 function extractManagedStoragePath(fileUrl) {
@@ -189,7 +197,14 @@ async function deleteManagedAsset(fileUrl) {
 }
 
 async function uploadAsset(file, scope, previousUrl = "") {
-    const storagePath = buildStoragePath(scope, file.name);
+    const { data: sessionData, error: sessionError } = await getSupabaseClient().auth.getSession();
+    const userId = sessionData?.session?.user?.id || currentUser?.id;
+
+    if (sessionError || !userId) {
+        throw new Error(sessionError?.message || "Sessao expirada. Saia e entre novamente para enviar midias.");
+    }
+
+    const storagePath = buildStoragePath(userId, scope, file.name);
     setSyncStatus(`Enviando ${file.name} para o Storage...`, "loading");
 
     const { error: uploadError } = await getSupabaseClient()
@@ -202,7 +217,7 @@ async function uploadAsset(file, scope, previousUrl = "") {
         });
 
     if (uploadError) {
-        throw uploadError;
+        throw new Error(uploadError.message || "Upload bloqueado pelo Storage.");
     }
 
     const { data } = getSupabaseClient()
@@ -699,7 +714,9 @@ function initAdmin() {
                 setSyncStatus("Upload concluido. Clique em salvar para persistir as alteracoes.", "success");
             } catch (error) {
                 console.error("Falha ao enviar item do portfolio:", error);
-                setSyncStatus("Nao foi possivel enviar o arquivo para o Storage.", "warning");
+                const message = error.message || "Nao foi possivel enviar o arquivo para o Storage.";
+                setSyncStatus(message, "warning");
+                alert(message);
             }
         };
         fileInput.click();
@@ -781,7 +798,9 @@ function initAdmin() {
                 setSyncStatus("Upload concluido. Clique em salvar para persistir as alteracoes.", "success");
             } catch (error) {
                 console.error("Falha ao enviar imagem para o Storage:", error);
-                setSyncStatus("Nao foi possivel enviar a imagem para o Storage.", "warning");
+                const message = error.message || "Nao foi possivel enviar a imagem para o Storage.";
+                setSyncStatus(message, "warning");
+                alert(message);
             } finally {
                 event.target.value = "";
             }
