@@ -758,6 +758,11 @@ body.public-view .admin-panel {
 .btn-add { background: #6b5b59; color: var(--text-light); display: block; width: 100%; margin-top: 15px; }
 .btn-save { background: var(--accent); color: var(--text-dark); flex: 1; }
 .btn-reset { background: transparent; color: var(--text-secondary); border: 1px solid #4a3c3a; }
+.btn-logout-admin {
+    background: rgba(245, 239, 239, 0.08);
+    color: var(--text-light);
+    border: 1px solid rgba(245, 239, 239, 0.14);
+}
 .btn-print-sidebar { background: #6b5b59; color: var(--text-light); width: 100%; margin-top: 10px; }
 .share-box {
     display: grid;
@@ -781,7 +786,7 @@ body.public-view .admin-panel {
     bottom: 0;
     z-index: 3;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 14px 22px 18px;
     background: rgba(79, 63, 60, 0.98);

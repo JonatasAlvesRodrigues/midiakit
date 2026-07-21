@@ -521,6 +521,23 @@ function populateMediaKit() {
     }
 }
 
+async function signOutCurrentUser(button) {
+    if (button) {
+        button.disabled = true;
+    }
+
+    const { error } = await getSupabaseClient().auth.signOut();
+    if (error) {
+        alert(error.message);
+        if (button) {
+            button.disabled = false;
+        }
+        return;
+    }
+
+    window.location.replace("/login.html");
+}
+
 function updateAuthUi(session) {
     const user = session?.user || currentUser;
     const nameElement = document.getElementById("user-name");
@@ -537,16 +554,7 @@ function updateAuthUi(session) {
     }
 
     if (logoutButton) {
-        logoutButton.onclick = async () => {
-            logoutButton.disabled = true;
-            const { error } = await getSupabaseClient().auth.signOut();
-            if (error) {
-                alert(error.message);
-                logoutButton.disabled = false;
-                return;
-            }
-            window.location.replace("/login.html");
-        };
+        logoutButton.onclick = () => signOutCurrentUser(logoutButton);
     }
 }
 
@@ -591,6 +599,7 @@ function initAdmin() {
     const closeAdminButton = document.getElementById("close-admin-button");
     const saveButton = document.getElementById("save-data");
     const resetButton = document.getElementById("reset-data");
+    const adminLogoutButton = document.getElementById("logout-admin-button");
     const generateShareButton = document.getElementById("generate-share-link");
     const copyShareButton = document.getElementById("copy-share-link");
     const shareLinkInput = document.getElementById("public-share-link");
@@ -898,6 +907,10 @@ function initAdmin() {
             await navigator.clipboard.writeText(shareLinkInput.value);
             alert("Link copiado.");
         });
+    }
+
+    if (adminLogoutButton) {
+        adminLogoutButton.addEventListener("click", () => signOutCurrentUser(adminLogoutButton));
     }
 
     resetButton.addEventListener("click", async () => {
