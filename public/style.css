@@ -26,6 +26,15 @@ body {
     padding: 88px 20px 40px;
 }
 
+body.public-view {
+    padding-top: 40px;
+}
+
+body.public-view .auth-toolbar,
+body.public-view .admin-panel {
+    display: none;
+}
+
 .auth-toolbar {
     position: fixed;
     top: 20px;
@@ -750,6 +759,23 @@ body {
 .btn-save { background: var(--accent); color: var(--text-dark); flex: 1; }
 .btn-reset { background: transparent; color: var(--text-secondary); border: 1px solid #4a3c3a; }
 .btn-print-sidebar { background: #6b5b59; color: var(--text-light); width: 100%; margin-top: 10px; }
+.share-box {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+.share-box input {
+    min-width: 0;
+}
+.share-box button {
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--text-dark);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0 16px;
+}
 .admin-actions {
     position: sticky;
     bottom: 0;

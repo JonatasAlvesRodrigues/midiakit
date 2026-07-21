@@ -6,6 +6,8 @@ let currentProfile = {
     email: ""
 };
 let mediaKitData = JSON.parse(JSON.stringify(defaultData));
+let currentPublicSlug = "";
+let currentIsPublic = false;
 
 function cloneDefaultData() {
     return JSON.parse(JSON.stringify(defaultData));
@@ -29,6 +31,35 @@ function getPublicConfig() {
 
 function getStorageBucket() {
     return getPublicConfig().storageBucket || "media-assets";
+}
+
+function getPublicKitSlug() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("kit") || params.get("share") || "";
+}
+
+function slugify(value) {
+    return String(value || "media-kit")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 48) || "media-kit";
+}
+
+function buildPublicSlug() {
+    const base = slugify(mediaKitData.name || currentProfile.fullName || currentUser?.email || "media-kit");
+    const suffix = currentUser?.id ? currentUser.id.slice(0, 8) : crypto.randomUUID().slice(0, 8);
+    return `${base}-${suffix}`;
+}
+
+function buildPublicShareUrl(slug = currentPublicSlug) {
+    if (!slug) {
+        return "";
+    }
+
+    return `${window.location.origin}${window.location.pathname}?kit=${encodeURIComponent(slug)}`;
 }
 
 function setSyncStatus(message, type = "") {
@@ -278,7 +309,7 @@ async function loadMediaKitData() {
 
     const { data, error } = await getSupabaseClient()
         .from("media_kits")
-        .select("payload")
+        .select("payload, public_slug, is_public")
         .eq("user_id", currentUser.id)
         .maybeSingle();
 
@@ -291,6 +322,8 @@ async function loadMediaKitData() {
 
     if (data?.payload) {
         mediaKitData = applyProfileDefaults(data.payload);
+        currentPublicSlug = data.public_slug || "";
+        currentIsPublic = Boolean(data.is_public);
         writeCachedMediaKitData(mediaKitData);
         setSyncStatus("Dados sincronizados com o Supabase.", "success");
         return;
@@ -309,6 +342,8 @@ async function loadMediaKitData() {
     }
 
     mediaKitData = applyProfileDefaults(cloneDefaultData());
+    currentPublicSlug = "";
+    currentIsPublic = false;
     setSyncStatus("Usando modelo padrao. Salve para criar seu media kit.", "loading");
 }
 
@@ -328,7 +363,9 @@ async function saveMediaKitData(options = {}) {
         .upsert(
             {
                 user_id: currentUser.id,
-                payload: mediaKitData
+                payload: mediaKitData,
+                public_slug: currentPublicSlug || null,
+                is_public: currentIsPublic
             },
             {
                 onConflict: "user_id"
@@ -344,6 +381,32 @@ async function saveMediaKitData(options = {}) {
 
     writeCachedMediaKitData(mediaKitData);
     setSyncStatus(successMessage, "success");
+    return true;
+}
+
+async function loadPublicMediaKitData(publicSlug) {
+    document.body.classList.add("public-view");
+    await window.supabaseReady;
+
+    const { data, error } = await getSupabaseClient()
+        .from("media_kits")
+        .select("payload, public_slug")
+        .eq("public_slug", publicSlug)
+        .eq("is_public", true)
+        .maybeSingle();
+
+    if (error || !data?.payload) {
+        console.error("Falha ao carregar media kit publico:", error);
+        mediaKitData = normalizeMediaKitData({
+            ...cloneDefaultData(),
+            name: "Media kit indisponivel",
+            bio: "Este link nao esta ativo ou ainda nao foi publicado pelo creator."
+        });
+        return false;
+    }
+
+    mediaKitData = normalizeMediaKitData(data.payload);
+    currentPublicSlug = data.public_slug || publicSlug;
     return true;
 }
 
@@ -528,6 +591,15 @@ function initAdmin() {
     const closeAdminButton = document.getElementById("close-admin-button");
     const saveButton = document.getElementById("save-data");
     const resetButton = document.getElementById("reset-data");
+    const generateShareButton = document.getElementById("generate-share-link");
+    const copyShareButton = document.getElementById("copy-share-link");
+    const shareLinkInput = document.getElementById("public-share-link");
+
+    const updateShareLinkUi = () => {
+        if (shareLinkInput) {
+            shareLinkInput.value = currentIsPublic && currentPublicSlug ? buildPublicShareUrl() : "";
+        }
+    };
 
     const fillMainInputs = () => {
         document.getElementById("edit-profile-name").value = currentProfile.fullName;
@@ -608,6 +680,38 @@ function initAdmin() {
         fileInput.click();
     };
 
+    const collectEditorData = () => {
+        mediaKitData.name = document.getElementById("edit-name").value.trim();
+        mediaKitData.title = document.getElementById("edit-title").value.trim();
+        mediaKitData.tags = document.getElementById("edit-tags").value.trim();
+        mediaKitData.bio = document.getElementById("edit-bio").value.trim();
+
+        Object.keys(mediaKitData.images).forEach((key) => {
+            const input = document.getElementById(`edit-img-${key}`);
+            if (input) {
+                mediaKitData.images[key] = input.value.trim();
+            }
+        });
+
+        const saveList = (containerId, dataArray, fields) => {
+            const container = document.getElementById(containerId);
+            fields.forEach((field) => {
+                container.querySelectorAll(`.edit-${field.key}`).forEach((input) => {
+                    const index = input.dataset.index;
+                    if (dataArray[index]) {
+                        dataArray[index][field.key] = input.value.trim();
+                    }
+                });
+            });
+        };
+
+        saveList("edit-services-container", mediaKitData.services, [{ key: "icon" }, { key: "name" }]);
+        saveList("edit-reasons-container", mediaKitData.reasons, [{ key: "icon" }, { key: "text" }]);
+        saveList("edit-partners-container", mediaKitData.partners, [{ key: "name" }, { key: "logo" }]);
+        saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }]);
+        saveList("edit-contacts-container", mediaKitData.contacts, [{ key: "icon" }, { key: "value" }]);
+    };
+
     const toggleAdminPanel = () => adminPanel.classList.toggle("active");
     const openAdminPanel = () => adminPanel.classList.add("active");
     const closeAdminPanel = () => adminPanel.classList.remove("active");
@@ -631,6 +735,8 @@ function initAdmin() {
 
     fillMainInputs();
     renderAdminLists();
+    updateShareLinkUi();
+    openAdminPanel();
 
     document.querySelectorAll(".edit-img-file").forEach((input) => {
         input.addEventListener("change", async (event) => {
@@ -721,41 +827,14 @@ function initAdmin() {
         saveButton.disabled = true;
 
         try {
-            mediaKitData.name = document.getElementById("edit-name").value.trim();
-            mediaKitData.title = document.getElementById("edit-title").value.trim();
-            mediaKitData.tags = document.getElementById("edit-tags").value.trim();
-            mediaKitData.bio = document.getElementById("edit-bio").value.trim();
-
-            Object.keys(mediaKitData.images).forEach((key) => {
-                const input = document.getElementById(`edit-img-${key}`);
-                if (input) {
-                    mediaKitData.images[key] = input.value.trim();
-                }
-            });
-
-            const saveList = (containerId, dataArray, fields) => {
-                const container = document.getElementById(containerId);
-                fields.forEach((field) => {
-                    container.querySelectorAll(`.edit-${field.key}`).forEach((input) => {
-                        const index = input.dataset.index;
-                        if (dataArray[index]) {
-                            dataArray[index][field.key] = input.value.trim();
-                        }
-                    });
-                });
-            };
-
-            saveList("edit-services-container", mediaKitData.services, [{ key: "icon" }, { key: "name" }]);
-            saveList("edit-reasons-container", mediaKitData.reasons, [{ key: "icon" }, { key: "text" }]);
-            saveList("edit-partners-container", mediaKitData.partners, [{ key: "name" }, { key: "logo" }]);
-            saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }]);
-            saveList("edit-contacts-container", mediaKitData.contacts, [{ key: "icon" }, { key: "value" }]);
+            collectEditorData();
 
             await saveProfileData();
             const passwordUpdated = await saveAccountPasswordIfNeeded();
             updateAuthUi();
             populateMediaKit();
             const saved = await saveMediaKitData();
+            updateShareLinkUi();
 
             if (!saved) {
                 alert("Nao foi possivel salvar no Supabase. O cache local foi mantido.");
@@ -770,6 +849,56 @@ function initAdmin() {
             saveButton.disabled = false;
         }
     });
+
+    if (generateShareButton) {
+        generateShareButton.addEventListener("click", async () => {
+            generateShareButton.disabled = true;
+
+            try {
+                collectEditorData();
+                await saveProfileData();
+                currentPublicSlug = currentPublicSlug || buildPublicSlug();
+                currentIsPublic = true;
+                populateMediaKit();
+
+                const saved = await saveMediaKitData({
+                    successMessage: "Link publico gerado e media kit publicado para marcas."
+                });
+
+                if (!saved) {
+                    alert("Nao foi possivel gerar o link publico agora.");
+                    return;
+                }
+
+                updateShareLinkUi();
+                if (navigator.clipboard && shareLinkInput?.value) {
+                    await navigator.clipboard.writeText(shareLinkInput.value);
+                    alert("Link publico gerado e copiado.");
+                    return;
+                }
+
+                alert("Link publico gerado.");
+            } catch (error) {
+                console.error("Falha ao gerar link publico:", error);
+                alert(error.message || "Nao foi possivel gerar o link publico.");
+            } finally {
+                generateShareButton.disabled = false;
+            }
+        });
+    }
+
+    if (copyShareButton) {
+        copyShareButton.addEventListener("click", async () => {
+            updateShareLinkUi();
+            if (!shareLinkInput?.value) {
+                alert("Gere o link publico primeiro.");
+                return;
+            }
+
+            await navigator.clipboard.writeText(shareLinkInput.value);
+            alert("Link copiado.");
+        });
+    }
 
     resetButton.addEventListener("click", async () => {
         if (!window.confirm("Deseja restaurar os dados padrao?")) {
@@ -799,6 +928,13 @@ function initAdmin() {
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
+        const publicSlug = getPublicKitSlug();
+        if (publicSlug) {
+            await loadPublicMediaKitData(publicSlug);
+            populateMediaKit();
+            return;
+        }
+
         const isAuthenticated = await requireAuthenticatedUser();
         if (!isAuthenticated) {
             return;

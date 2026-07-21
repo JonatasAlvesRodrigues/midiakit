@@ -219,10 +219,20 @@
                 <button class="btn-add" id="add-portfolio-item" data-list="portfolio">Adicionar Mídia</button>
             </div>
 
-            <div class="admin-section">
+            <div class="admin-section" id="admin-contact">
                 <h4>Contato</h4>
                 <div id="edit-contacts-container"></div>
                 <button class="btn-add" data-list="contacts">Adicionar Contato</button>
+            </div>
+
+            <div class="admin-section">
+                <h4>Compartilhar com marcas</h4>
+                <p class="admin-note">Gere um link publico para marcas verem o media kit pronto, sem login e sem painel de edicao.</p>
+                <div class="share-box">
+                    <input type="text" id="public-share-link" readonly placeholder="Salve e gere o link publico">
+                    <button id="copy-share-link" type="button">Copiar</button>
+                </div>
+                <button class="btn-add" id="generate-share-link" type="button">Gerar link publico</button>
             </div>
 
             <div class="admin-actions">
