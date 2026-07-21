@@ -368,7 +368,7 @@ body.public-view .admin-panel {
 }
 
 .insight-item {
-    min-height: 120px;
+    min-height: 150px;
     padding: 18px;
     border: 1px solid rgba(245, 239, 239, 0.12);
     border-radius: 8px;
@@ -377,12 +377,32 @@ body.public-view .admin-panel {
     flex-direction: column;
     justify-content: space-between;
     gap: 14px;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
 
-.insight-item i {
+.insight-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(196, 163, 136, 0.42);
+    background: rgba(59, 47, 45, 0.42);
+}
+
+.insight-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.insight-topline i {
     width: 22px;
     height: 22px;
     color: var(--accent);
+}
+
+.insight-topline span {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .insight-value {
@@ -400,6 +420,28 @@ body.public-view .admin-panel {
     line-height: 1.4;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.insight-meter {
+    width: 100%;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(245, 239, 239, 0.12);
+    overflow: hidden;
+}
+
+.insight-meter span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), #f2d7be);
+    transform-origin: left center;
+    animation: insightGrow 0.7s ease both;
+}
+
+@keyframes insightGrow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
 }
 
 /* =============================
@@ -1092,7 +1134,7 @@ body.public-view .admin-panel {
     }
 
     .insight-item {
-        min-height: 112px;
+        min-height: 138px;
         padding: 14px;
     }
 

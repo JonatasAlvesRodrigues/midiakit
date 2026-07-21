@@ -29,12 +29,12 @@ const mediaKitConfig = {
     ],
 
     insights: [
-        { icon: "eye", label: "Visualizacoes mensais", value: "+1.2M" },
-        { icon: "bar-chart-3", label: "Alcance medio", value: "+800 mil" },
-        { icon: "users", label: "Publico principal", value: "18-34 anos" },
-        { icon: "map-pin", label: "Maior publico", value: "Brasil" },
-        { icon: "venus-and-mars", label: "Genero predominante", value: "Feminino e masculino" },
-        { icon: "target", label: "Perfil alvo", value: "Lifestyle, humor e autocuidado" }
+        { icon: "eye", label: "Visualizacoes mensais", value: "+1.2M", percent: "92" },
+        { icon: "bar-chart-3", label: "Alcance medio", value: "+800 mil", percent: "84" },
+        { icon: "users", label: "Publico principal", value: "18-34 anos", percent: "76" },
+        { icon: "map-pin", label: "Maior publico", value: "Brasil", percent: "88" },
+        { icon: "venus-and-mars", label: "Genero predominante", value: "Feminino e masculino", percent: "68" },
+        { icon: "target", label: "Perfil alvo", value: "Lifestyle, humor e autocuidado", percent: "73" }
     ],
 
     partners: [

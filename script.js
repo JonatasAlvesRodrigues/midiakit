@@ -106,6 +106,19 @@ function inferPortfolioTypeFromUrl(url) {
     return /\.(mp4|webm|mov)(\?|#|$)/i.test(url) ? "video" : "image";
 }
 
+function clampPercent(value, fallback = 65) {
+    const numericValue = Number.parseInt(String(value || "").replace(/[^\d]/g, ""), 10);
+    if (Number.isNaN(numericValue)) {
+        return fallback;
+    }
+
+    return Math.max(0, Math.min(100, numericValue));
+}
+
+function getInsightPercent(insight, index) {
+    return clampPercent(insight.percent, 58 + ((index * 9) % 34));
+}
+
 function setSyncStatus(message, type = "") {
     const syncStatus = getSyncStatusElement();
     if (!syncStatus) {
@@ -560,15 +573,24 @@ function populateMediaKit() {
 
     const insightsContainer = document.querySelector(".dynamic-insights");
     if (insightsContainer) {
-        insightsContainer.innerHTML = mediaKitData.insights.map((insight) => `
+        insightsContainer.innerHTML = mediaKitData.insights.map((insight, index) => {
+            const percent = getInsightPercent(insight, index);
+            return `
             <div class="insight-item">
-                <i data-lucide="${getIconName(insight.icon, "bar-chart-3")}"></i>
-                <div>
+                <div class="insight-topline">
+                    <i data-lucide="${getIconName(insight.icon, "bar-chart-3")}"></i>
+                    <span>${percent}%</span>
+                </div>
+                <div class="insight-main">
                     <div class="insight-value">${insight.value || "-"}</div>
                     <div class="insight-label">${insight.label}</div>
                 </div>
+                <div class="insight-meter" aria-label="${insight.label}: ${percent}%">
+                    <span style="width: ${percent}%"></span>
+                </div>
             </div>
-        `).join("");
+        `;
+        }).join("");
     }
 
     const partnersContainer = document.querySelector(".dynamic-partners");
@@ -805,7 +827,7 @@ function initAdmin() {
         createListEditor("edit-services-container", mediaKitData.services, [{ key: "icon", label: "Icone (Lucide)" }, { key: "name", label: "Nome do Servico" }], { listName: "services" });
         createListEditor("edit-reasons-container", mediaKitData.reasons, [{ key: "icon", label: "Icone (Lucide)" }, { key: "text", label: "Texto da Razao" }], { listName: "reasons" });
         createListEditor("edit-partners-container", mediaKitData.partners, [{ key: "name", label: "Nome" }, { key: "logo", label: "URL do Logo" }], { listName: "partners" });
-        createListEditor("edit-insights-container", mediaKitData.insights, [{ key: "icon", label: "Icone (Lucide)" }, { key: "label", label: "Nome do dado" }, { key: "value", label: "Numero ou informacao" }], { listName: "insights" });
+        createListEditor("edit-insights-container", mediaKitData.insights, [{ key: "icon", label: "Icone (Lucide)" }, { key: "label", label: "Nome do dado" }, { key: "value", label: "Numero ou informacao" }, { key: "percent", label: "Forca da barra (0 a 100)" }], { listName: "insights" });
         createListEditor("edit-portfolio-container", mediaKitData.portfolio, [{ key: "url", label: "Arquivo no Storage" }], { isPortfolio: true, listName: "portfolio" });
         createListEditor("edit-contacts-container", mediaKitData.contacts, [{ key: "icon", label: "Icone (Lucide)" }, { key: "value", label: "Informacao de Contato" }], { listName: "contacts" });
     };
@@ -865,7 +887,7 @@ function initAdmin() {
         saveList("edit-services-container", mediaKitData.services, [{ key: "icon" }, { key: "name" }]);
         saveList("edit-reasons-container", mediaKitData.reasons, [{ key: "icon" }, { key: "text" }]);
         saveList("edit-partners-container", mediaKitData.partners, [{ key: "name" }, { key: "logo" }]);
-        saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }]);
+        saveList("edit-insights-container", mediaKitData.insights, [{ key: "icon" }, { key: "label" }, { key: "value" }, { key: "percent" }]);
         saveList("edit-portfolio-container", mediaKitData.portfolio, [{ key: "type" }, { key: "url" }, { key: "originalUrl" }]);
         saveList("edit-contacts-container", mediaKitData.contacts, [{ key: "icon" }, { key: "value" }]);
     };
@@ -945,7 +967,7 @@ function initAdmin() {
                 newItem = { name: "Nova Marca", logo: "https://via.placeholder.com/150" };
                 break;
             case "insights":
-                newItem = { icon: "bar-chart-3", label: "Novo insight", value: "+0" };
+                newItem = { icon: "bar-chart-3", label: "Novo insight", value: "+0", percent: "50" };
                 break;
             case "portfolio":
                 openPortfolioUpload();
