@@ -736,6 +736,7 @@ function initAdmin() {
     const copyShareButton = document.getElementById("copy-share-link");
     const shareLinkInput = document.getElementById("public-share-link");
     const addPortfolioLinkButton = document.getElementById("add-portfolio-link");
+    const portfolioLinkInput = document.getElementById("portfolio-link-input");
 
     const updateShareLinkUi = () => {
         if (shareLinkInput) {
@@ -1059,21 +1060,36 @@ function initAdmin() {
         });
     }
 
-    if (addPortfolioLinkButton) {
-        addPortfolioLinkButton.addEventListener("click", () => {
-            const url = normalizeExternalUrl(window.prompt("Cole o link do video ou conteudo original:"));
-            if (!url) {
-                return;
-            }
+    const addPortfolioLink = () => {
+        const url = normalizeExternalUrl(portfolioLinkInput?.value || "");
+        if (!url) {
+            alert("Cole um link antes de adicionar.");
+            portfolioLinkInput?.focus();
+            return;
+        }
 
-            mediaKitData.portfolio.push({
-                type: inferPortfolioTypeFromUrl(url),
-                url,
-                originalUrl: url
-            });
-            renderAdminLists();
-            populateMediaKit();
-            setSyncStatus("Link adicionado. Clique em salvar para persistir as alteracoes.", "success");
+        mediaKitData.portfolio.push({
+            type: inferPortfolioTypeFromUrl(url),
+            url,
+            originalUrl: url
+        });
+        if (portfolioLinkInput) {
+            portfolioLinkInput.value = "";
+        }
+        renderAdminLists();
+        populateMediaKit();
+        setSyncStatus("Link adicionado. Clique em salvar para persistir as alteracoes.", "success");
+    };
+
+    if (addPortfolioLinkButton) {
+        addPortfolioLinkButton.addEventListener("click", addPortfolioLink);
+    }
+    if (portfolioLinkInput) {
+        portfolioLinkInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                addPortfolioLink();
+            }
         });
     }
 
