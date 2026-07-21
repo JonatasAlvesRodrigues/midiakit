@@ -85,6 +85,10 @@ function getIconName(iconName, fallback = "circle") {
     return iconMap[iconName] || iconName || fallback;
 }
 
+function isLikelyBrokenExternalUrl(url) {
+    return /encrypted-tbn\d*\.gstatic\.com\/images/i.test(String(url || ""));
+}
+
 function setSyncStatus(message, type = "") {
     const syncStatus = getSyncStatusElement();
     if (!syncStatus) {
@@ -205,6 +209,60 @@ async function deleteManagedAsset(fileUrl) {
     }
 }
 
+function canvasToBlob(canvas, type, quality) {
+    return new Promise((resolve) => {
+        canvas.toBlob(resolve, type, quality);
+    });
+}
+
+async function optimizeImageFile(file) {
+    if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/heic" || file.type === "image/heif") {
+        return file;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.decoding = "async";
+
+    try {
+        await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = reject;
+            image.src = objectUrl;
+        });
+
+        const maxDimension = 1800;
+        const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+
+        if (scale === 1 && file.size < 1600000) {
+            return file;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.naturalWidth * scale);
+        canvas.height = Math.round(image.naturalHeight * scale);
+
+        const context = canvas.getContext("2d", { alpha: false });
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        const blob = await canvasToBlob(canvas, "image/jpeg", 0.84);
+        if (!blob || blob.size >= file.size) {
+            return file;
+        }
+
+        const optimizedName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+        return new File([blob], optimizedName, {
+            type: "image/jpeg",
+            lastModified: Date.now()
+        });
+    } catch (error) {
+        console.warn("Nao foi possivel otimizar a imagem antes do upload:", error);
+        return file;
+    } finally {
+        URL.revokeObjectURL(objectUrl);
+    }
+}
+
 async function uploadAsset(file, scope, previousUrl = "") {
     const { data: sessionData, error: sessionError } = await getSupabaseClient().auth.getSession();
     const userId = sessionData?.session?.user?.id || currentUser?.id;
@@ -213,16 +271,18 @@ async function uploadAsset(file, scope, previousUrl = "") {
         throw new Error(sessionError?.message || "Sessao expirada. Saia e entre novamente para enviar midias.");
     }
 
-    const storagePath = buildStoragePath(userId, scope, file.name);
-    setSyncStatus(`Enviando ${file.name} para o Storage...`, "loading");
+    setSyncStatus(file.type.startsWith("image/") ? "Otimizando imagem..." : `Preparando ${file.name}...`, "loading");
+    const uploadFile = await optimizeImageFile(file);
+    const storagePath = buildStoragePath(userId, scope, uploadFile.name);
+    setSyncStatus(`Enviando ${uploadFile.name} para o Storage...`, "loading");
 
     const { error: uploadError } = await getSupabaseClient()
         .storage
         .from(getStorageBucket())
-        .upload(storagePath, file, {
+        .upload(storagePath, uploadFile, {
             cacheControl: "3600",
             upsert: false,
-            contentType: file.type
+            contentType: uploadFile.type || file.type
         });
 
     if (uploadError) {
@@ -461,8 +521,9 @@ function populateMediaKit() {
         const imageElement = document.querySelector(`.dynamic-img-${key}`);
         if (imageElement) {
             const imageUrl = mediaKitData.images[key];
-            imageElement.toggleAttribute("hidden", !imageUrl);
-            imageElement.src = imageUrl || "";
+            const canRenderImage = imageUrl && !isLikelyBrokenExternalUrl(imageUrl);
+            imageElement.toggleAttribute("hidden", !canRenderImage);
+            imageElement.src = canRenderImage ? imageUrl : "";
             imageElement.onerror = () => {
                 imageElement.hidden = true;
             };
@@ -494,8 +555,9 @@ function populateMediaKit() {
     }
 
     const partnersContainer = document.querySelector(".dynamic-partners");
-    if (mediaKitData.partners.length > 0) {
-        const duplicatedPartners = [...mediaKitData.partners, ...mediaKitData.partners];
+    const renderablePartners = mediaKitData.partners.filter((partner) => partner.logo && !isLikelyBrokenExternalUrl(partner.logo));
+    if (renderablePartners.length > 0) {
+        const duplicatedPartners = [...renderablePartners, ...renderablePartners];
         partnersContainer.innerHTML = duplicatedPartners.map((partner) => `
             <div class="partner-logo">
                 <img src="${partner.logo}" alt="${partner.name}" onerror="this.closest('.partner-logo').style.display='none'">
@@ -516,7 +578,8 @@ function populateMediaKit() {
     `).join("");
 
     const portfolioContainer = document.querySelector(".dynamic-portfolio");
-    portfolioContainer.innerHTML = mediaKitData.portfolio.map((item) => {
+    const renderablePortfolio = mediaKitData.portfolio.filter((item) => item.url && !isLikelyBrokenExternalUrl(item.url));
+    portfolioContainer.innerHTML = renderablePortfolio.map((item) => {
         const isVideo = item.type === "video";
         if (isVideo) {
             return `
