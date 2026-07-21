@@ -76,6 +76,15 @@ function getAppUrl(path = "") {
     return `${getAppBasePath()}${path}`;
 }
 
+function getIconName(iconName, fallback = "circle") {
+    const iconMap = {
+        instagram: "camera",
+        tiktok: "music"
+    };
+
+    return iconMap[iconName] || iconName || fallback;
+}
+
 function setSyncStatus(message, type = "") {
     const syncStatus = getSyncStatusElement();
     if (!syncStatus) {
@@ -454,13 +463,16 @@ function populateMediaKit() {
             const imageUrl = mediaKitData.images[key];
             imageElement.toggleAttribute("hidden", !imageUrl);
             imageElement.src = imageUrl || "";
+            imageElement.onerror = () => {
+                imageElement.hidden = true;
+            };
         }
     });
 
     const statsContainer = document.querySelector(".dynamic-stats");
     statsContainer.innerHTML = mediaKitData.stats.map((stat) => `
         <div class="stat-item">
-            <i data-lucide="${stat.icon}"></i>
+            <i data-lucide="${getIconName(stat.icon)}"></i>
             <div>
                 <span class="label">${stat.label}</span>
                 ${stat.value ? `<div class="value">${stat.value}</div>` : ""}
@@ -472,7 +484,7 @@ function populateMediaKit() {
     if (insightsContainer) {
         insightsContainer.innerHTML = mediaKitData.insights.map((insight) => `
             <div class="insight-item">
-                <i data-lucide="${insight.icon}"></i>
+                <i data-lucide="${getIconName(insight.icon, "bar-chart-3")}"></i>
                 <div>
                     <div class="insight-value">${insight.value || "-"}</div>
                     <div class="insight-label">${insight.label}</div>
@@ -486,7 +498,7 @@ function populateMediaKit() {
         const duplicatedPartners = [...mediaKitData.partners, ...mediaKitData.partners];
         partnersContainer.innerHTML = duplicatedPartners.map((partner) => `
             <div class="partner-logo">
-                <img src="${partner.logo}" alt="${partner.name}">
+                <img src="${partner.logo}" alt="${partner.name}" onerror="this.closest('.partner-logo').style.display='none'">
             </div>
         `).join("");
     } else {
@@ -495,12 +507,12 @@ function populateMediaKit() {
 
     const servicesContainer = document.querySelector(".dynamic-services");
     servicesContainer.innerHTML = mediaKitData.services.map((service) => `
-        <li><i data-lucide="${service.icon}"></i> ${service.name}</li>
+        <li><i data-lucide="${getIconName(service.icon, "circle")}"></i> ${service.name}</li>
     `).join("");
 
     const reasonsContainer = document.querySelector(".dynamic-reasons");
     reasonsContainer.innerHTML = mediaKitData.reasons.map((reason) => `
-        <li><i data-lucide="${reason.icon}"></i> ${reason.text}</li>
+        <li><i data-lucide="${getIconName(reason.icon, "check-circle")}"></i> ${reason.text}</li>
     `).join("");
 
     const portfolioContainer = document.querySelector(".dynamic-portfolio");
@@ -516,7 +528,7 @@ function populateMediaKit() {
 
         return `
             <div class="portfolio-item">
-                <img src="${item.url}" class="portfolio-media" alt="Portfolio item">
+                <img src="${item.url}" class="portfolio-media" alt="Portfolio item" onerror="this.closest('.portfolio-item').style.display='none'">
             </div>
         `;
     }).join("");
@@ -542,7 +554,7 @@ function populateMediaKit() {
     const contactsContainer = document.querySelector(".dynamic-contacts");
     contactsContainer.innerHTML = mediaKitData.contacts.map((contact) => `
         <div class="contact-item">
-            <i data-lucide="${contact.icon}"></i>
+            <i data-lucide="${getIconName(contact.icon, "mail")}"></i>
             <span>${contact.value}</span>
         </div>
     `).join("");

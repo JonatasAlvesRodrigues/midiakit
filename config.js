@@ -22,8 +22,8 @@ const mediaKitConfig = {
     },
 
     stats: [
-        { icon: "instagram", label: "Instagram", value: "@carmo_joao2" },
-        { icon: "tiktok", label: "TikTok", value: "@carmojoao" },
+        { icon: "camera", label: "Instagram", value: "@carmo_joao2" },
+        { icon: "music", label: "TikTok", value: "@carmojoao" },
         { icon: "users", label: "Contas Alcancadas", value: "+800 MIL" },
         { icon: "heart", label: "Alto engajamento e conexao real com a audiencia", value: "" }
     ],
@@ -67,7 +67,7 @@ const mediaKitConfig = {
     portfolio: [],
 
     contacts: [
-        { icon: "instagram", value: "@carmo_joao2" },
+        { icon: "camera", value: "@carmo_joao2" },
         { icon: "mail", value: "joaovitorscarmo@outlook.com" },
         { icon: "phone", value: "(18) 99681-8577" }
     ],
